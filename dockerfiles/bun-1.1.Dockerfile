@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.7-labs
-FROM oven/bun:1.1-alpine
+
+FROM oven/bun:1.1.4-alpine
 
 ENV CODECRAFTERS_DEPENDENCY_FILE_PATHS="package.json,bun.lockb"
 
@@ -16,3 +17,6 @@ RUN bun install --frozen-lockfile
 # If the node_modules directory exists, move it to /app-cached
 RUN mkdir -p /app-cached
 RUN if [ -d "/app/node_modules" ]; then mv /app/node_modules /app-cached; fi
+
+# Once the heave steps are done, we can copy all files back
+COPY . /app
