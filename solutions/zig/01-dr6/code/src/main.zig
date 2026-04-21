@@ -1,4 +1,7 @@
 const std = @import("std");
+var stdout_buffer: [1024]u8 = undefined;
+var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+const stdout = &stdout_writer.interface;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -9,8 +12,8 @@ pub fn main() !void {
     defer std.process.argsFree(allocator, args);
 
     if (args.len < 3) {
-        try std.io.getStdErr().writer().print("Usage: {s} <database_file_path> <command>\n", .{args[0]});
-        return;
+        std.debug.print("Usage: {s} <database_file_path> <command>\n", .{args[0]});
+        std.process.exit(1);
     }
 
     const database_file_path: []const u8 = args[1];
@@ -24,6 +27,7 @@ pub fn main() !void {
         _ = try file.seekTo(16);
         _ = try file.read(&buf);
         const page_size = std.mem.readInt(u16, &buf, .big);
-        try std.io.getStdOut().writer().print("database page size: {}\n", .{page_size});
+        try stdout.print("database page size: {}\n", .{page_size});
+        try stdout.flush();
     }
 }

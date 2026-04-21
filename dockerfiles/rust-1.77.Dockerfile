@@ -2,8 +2,8 @@
 FROM rust:1.77-buster
 
 
-RUN mkdir /app/src
-RUN echo 'fn main() { println!("Hello World!"); }' > /app/src/main.rs
+# .git & README.md are unique per-repository. We ignore them on first copy to prevent cache misses
+COPY --exclude=.git --exclude=README.md . /app
 
 WORKDIR /app
 # .git & README.md are unique per-repository. We ignore them on first copy to prevent cache misses
@@ -21,7 +21,7 @@ RUN rm -f /tmp/codecrafters-sqlite-target/release/.fingerprint/sqlite_starter_ru
 
 RUN rm -rf /app/src
 
-RUN echo "cd \${CODECRAFTERS_SUBMISSION_DIR} && cargo build --release --target-dir=/tmp/codecrafters-sqlite-target --manifest-path Cargo.toml" > /codecrafters-precompile.sh
+RUN echo "cd \${CODECRAFTERS_REPOSITORY_DIR} && cargo build --release --target-dir=/tmp/codecrafters-sqlite-target --manifest-path Cargo.toml" > /codecrafters-precompile.sh
 RUN chmod +x /codecrafters-precompile.sh
 
 ENV CODECRAFTERS_DEPENDENCY_FILE_PATHS="Cargo.toml,Cargo.lock"
